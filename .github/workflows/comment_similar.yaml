@@ -1,0 +1,28 @@
+name: Comment on Similar Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  comment-on-similar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: pip install .
+
+    - name: Run similarity check
+      run: python src/comment_on_similar.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPO: ${{ github.repository }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}

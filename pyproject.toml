@@ -1,0 +1,18 @@
+[project]
+name = "issue-embedder"
+version = "0.1.0"
+description = "Embed GitHub issues and detect similarity"
+requires-python = ">=3.12"
+
+dependencies = [
+    "sentence-transformers==5.0.0",
+    "chromadb==1.0.15",
+    "pyyaml==6.0.1",
+    "requests==2.31.0",
+    "PyGithub==1.59.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0"
+]

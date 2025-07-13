@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Pytest test",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests"],  // or "." if test file is in root
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    }
+  ]
+}
