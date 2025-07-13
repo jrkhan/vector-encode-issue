@@ -3,6 +3,8 @@ name: Update Issue Embeddings
 on:
   issues:
     types: [opened, edited, reopened]
+  issue_comment:
+    types: [created]
 
 jobs:
   update-embedding:
@@ -12,32 +14,25 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-
     - name: Cache pip dependencies
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
         restore-keys: ${{ runner.os }}-pip-
-        
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
     - name: Install dependencies
       run: pip install .
 
-    - name: Update embedding for this issue
+    - name: Run embedding update (if authorized)
       run: python src/update_embedding_for_issue.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPO: ${{ github.repository }}
         ISSUE_NUMBER: ${{ github.event.issue.number }}
-
-    - name: Commit and push new embeddings
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git add embeddings.json embeddings.yaml
-        git diff --cached --quiet || git commit -m "Update embedding for issue #${{ github.event.issue.number }}"
-        git push
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
