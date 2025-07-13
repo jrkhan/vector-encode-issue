@@ -1,8 +1,6 @@
 name: Update Issue Embeddings
 
 on:
-  issues:
-    types: [opened, edited, reopened]
   issue_comment:
     types: [created]
 
@@ -13,6 +11,17 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
+
+    - name: Skip if comment does not include `vectorbot embed`
+      if: github.event_name == 'issue_comment'
+      run: |
+        echo "Checking comment body for command..."
+        body=$(jq -r .comment.body "$GITHUB_EVENT_PATH" | tr '[:upper:]' '[:lower:]')
+        echo "Comment body: $body"
+        if [[ "$body" != "vectorbot embed" ]]; then
+          echo "❌ Comment does not match 'vectorbot embed'. Exiting early."
+          exit 0
+        fi
 
     - name: Cache pip dependencies
       uses: actions/cache@v4
@@ -29,10 +38,9 @@ jobs:
     - name: Install dependencies
       run: pip install .
 
-    - name: Run embedding update (if authorized)
+    - name: Run embedding update
       run: python src/update_embedding_for_issue.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPO: ${{ github.repository }}
         ISSUE_NUMBER: ${{ github.event.issue.number }}
-        GITHUB_EVENT_PATH: ${{ github.event_path }}
