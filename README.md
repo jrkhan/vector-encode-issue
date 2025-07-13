@@ -99,12 +99,6 @@ Mocks GitHub issues and uses real ChromaDB locally for similarity testing.
 
 ---
 
-## 📝 License
-
-MIT
-
----
-
 ## 🤝 Contributions Welcome
 
 If you have ideas for additional commands (`vectorbot suggest`, `vectorbot clear`, etc.), feel free to open a PR or issue!
