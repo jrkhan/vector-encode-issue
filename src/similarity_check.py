@@ -13,7 +13,7 @@ def check_similarity_and_comment(issue_number: int, client: GitHubIssueClient):
         print(f"Issue #{issue_number} has no body. Skipping.")
         return
 
-    query_embedding = embedding_model.encode(issue_body, normalize_embeddings=True)[0].tolist()
+    query_embedding = embedding_model.encode(issue_body, normalize_embeddings=True).tolist()
 
     # Load Chroma DB
     chroma_path = os.getenv("CHROMA_PATH", "./chroma")
