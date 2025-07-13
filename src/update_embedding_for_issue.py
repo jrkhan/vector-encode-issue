@@ -1,27 +1,30 @@
-import os, json
+import os
+import json
 from sentence_transformers import SentenceTransformer
 from github import Github
 
-issue_number = int(os.getenv("ISSUE_NUMBER"))
-repo_name = os.getenv("GITHUB_REPO")
-token = os.getenv("GITHUB_TOKEN")
+def main():
+    issue_number = int(os.getenv("ISSUE_NUMBER"))
+    repo_name = os.getenv("GITHUB_REPO")
+    token = os.getenv("GITHUB_TOKEN")
 
-client = Github(token)
-repo = client.get_repo(repo_name)
-issue = repo.get_issue(number=issue_number)
+    gh = Github(token)
+    repo = gh.get_repo(repo_name)
+    issue = repo.get_issue(number=issue_number)
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
-embedding = model.encode([issue.body or ""], normalize_embeddings=True).tolist()[0]
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    embedding = model.encode([issue.body or ""], normalize_embeddings=True).tolist()[0]
 
-# Update embedding file (e.g. embeddings.json)
-path = "embeddings.json"
-try:
-    with open(path, "r") as f:
-        data = json.load(f)
-except FileNotFoundError:
-    data = []
+    os.makedirs("embeddings", exist_ok=True)
+    path = f"embeddings/issue-{issue_number}.json"
 
-data = [e for e in data if e["id"] != str(issue_number)]
-data.append({"id": str(issue_number), "embedding": embedding})
-with open(path, "w") as f:
-    json.dump(data, f, indent=2)
+    with open(path, "w") as f:
+        json.dump({
+            "id": str(issue_number),
+            "embedding": embedding
+        }, f, indent=2)
+
+    print(f"✅ Saved embedding for issue #{issue_number} to {path}")
+
+if __name__ == "__main__":
+    main()
