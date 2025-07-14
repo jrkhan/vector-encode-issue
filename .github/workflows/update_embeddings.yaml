@@ -13,7 +13,14 @@ jobs:
       - id: gate
         run: |
           body=$(jq -r .comment.body "$GITHUB_EVENT_PATH" | tr '[:upper:]' '[:lower:]')
-          echo "::set-output name=runme::$( [[ \"$body\" == \"vectorbot embed\" ]] && echo true || echo false )"
+          echo "Body: $body"
+          if [[ "$body" == "vectorbot embed" ]]; then
+            echo "✅ Matched"
+            echo "runme=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No match"
+            echo "runme=false" >> $GITHUB_OUTPUT
+          fi
   update-embedding:
     runs-on: ubuntu-latest
     if: needs.gate.outputs.runme == 'true' || github.event_name != 'issue_comment'
