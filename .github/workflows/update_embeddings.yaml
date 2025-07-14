@@ -5,23 +5,21 @@ on:
     types: [created]
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      runme: ${{ steps.gate.outputs.runme }}
+    steps:
+      - id: gate
+        run: |
+          body=$(jq -r .comment.body "$GITHUB_EVENT_PATH" | tr '[:upper:]' '[:lower:]')
+          echo "::set-output name=runme::$( [[ \"$body\" == \"vectorbot embed\" ]] && echo true || echo false )"
   update-embedding:
     runs-on: ubuntu-latest
-
-    steps:
+    if: needs.gate.outputs.runme == 'true' || github.event_name != 'issue_comment'
+    steps:  
     - name: Checkout repo
       uses: actions/checkout@v4
-
-    - name: Skip if comment does not include `vectorbot embed`
-      if: github.event_name == 'issue_comment'
-      run: |
-        echo "Checking comment body for command..."
-        body=$(jq -r .comment.body "$GITHUB_EVENT_PATH" | tr '[:upper:]' '[:lower:]')
-        echo "Comment body: $body"
-        if [[ "$body" != "vectorbot embed" ]]; then
-          echo "❌ Comment does not match 'vectorbot embed'. Exiting early."
-          exit 0
-        fi
 
     - name: Cache pip dependencies
       uses: actions/cache@v4
