@@ -16,14 +16,15 @@ jobs:
           echo "Body: $body"
           if [[ "$body" == "vectorbot embed" ]]; then
             echo "✅ Matched"
-            echo "runme=true" >> $GITHUB_OUTPUT
+            echo "run_embedding=true" >> $GITHUB_OUTPUT
           else
             echo "❌ No match"
-            echo "runme=false" >> $GITHUB_OUTPUT
+            echo "run_embedding=false" >> $GITHUB_OUTPUT
           fi
   update-embedding:
     runs-on: ubuntu-latest
-    if: needs.gate.outputs.runme == 'true' || github.event_name != 'issue_comment'
+    needs: gate
+    if: needs.gate.outputs.run_embedding == 'true' || github.event_name != 'issue_comment'
     steps:  
     - name: Checkout repo
       uses: actions/checkout@v4
