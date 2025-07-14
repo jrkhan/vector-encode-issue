@@ -8,9 +8,9 @@ jobs:
   gate:
     runs-on: ubuntu-latest
     outputs:
-      runme: ${{ steps.gate.outputs.runme }}
+      run_embedding: ${{ steps.check_comment_body.outputs.run_embedding }}
     steps:
-      - id: gate
+      - id: check_comment_body
         run: |
           body=$(jq -r .comment.body "$GITHUB_EVENT_PATH" | tr '[:upper:]' '[:lower:]')
           echo "Body: $body"
