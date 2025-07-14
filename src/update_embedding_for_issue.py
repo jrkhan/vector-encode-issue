@@ -55,8 +55,9 @@ def main():
             "id": str(issue_number),
             "embedding": embedding
         }, f, indent=2)
-
-    print(f"✅ Saved embedding for issue #{issue_number} to {path}")
+    msg = f"✅ Saved embedding for issue #{issue_number} to {path}"
+    issue.create_comment(msg)
+    print(msg)
 
 if __name__ == "__main__":
     main()
